@@ -1,0 +1,25 @@
+
+
+
+.registerInnerContainer{
+    height: 90%;
+    width: 50%;
+    background-color: #F2F2F2;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    justify-content: center;
+    align-items: center;
+    border-radius: 8px;
+}
+
+.login-label-succ{
+    color: green;
+}
+
+@media(max-width:650px){
+    .registerInnerContainer{
+        height: 90%;
+        width: 90%;
+    }
+}
