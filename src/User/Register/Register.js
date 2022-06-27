@@ -2,6 +2,7 @@ import {useState} from 'react';
 import Axios from 'axios';
 import { Link, useNavigate } from 'react-router-dom';
 import "./Register.css";
+import Loader from '../../loader/Loader';
 
 function  UserRegister(){
     const [userRegisterValues,setUserRegisterValues]=useState({
@@ -18,7 +19,11 @@ function  UserRegister(){
         setCreated(true);
         setUserRegisterValues(prevState=>({...prevState,[name]:value}))
     }
+    const [loginErr,setLoginErr]=useState("Username Already Registered");
+    const [isLoading,setIsLoading]=useState(true);
     const handleSubmit =(event)=>{
+        if(userRegisterValues.name!=='' && userRegisterValues.password!=='' && userRegisterValues.userName!=='')
+        {
         event.preventDefault();
             // Axios request to Login into the user Account
             Axios.post(registerUrl,{
@@ -36,9 +41,15 @@ function  UserRegister(){
                     },1500)
                 }).catch((err)=>{
                     if(err.response.status===400){
+                        setLoginErr("Username Already Registered");
                         setAlreadyExists(false);
                     }
             })
+        }
+        else{
+            setLoginErr("Please Fill details");
+            setAlreadyExists(false);
+        }
     };
     return(
         <>
@@ -70,8 +81,11 @@ function  UserRegister(){
                             placeholder='Password'
                             onChange={handleChange}/>
                         <button className='login-button' onClick={handleSubmit}>Register</button>
+                        <div className='loader-login' disabled={isLoading}>
+                            <Loader/>
+                        </div>
+                        <h4 className='login-label-err'disabled={alreadyExists}>{loginErr}</h4>
                         <h4 className='login-label-succ'disabled={created}>Account Created</h4>
-                        <h4 className='login-label-err'disabled={alreadyExists}>Username Already Registered</h4>
                         <Link to="/user/login"> <h4 className='employee-login-label'>Old User? Login</h4></Link>
             </div>
         </div>

@@ -1,6 +1,7 @@
 import {useState} from 'react';
 import Axios from 'axios';
 import "./Login.css";
+import Loader from "../../loader/Loader";
 import { Link, useNavigate } from 'react-router-dom';
 
 function UserLogin(){
@@ -15,12 +16,18 @@ function UserLogin(){
         setMisMatchErr(true);
         setUserLoginValues(prevState=>({...prevState,[name]:value}))
     }
+    const [loginErr,setLoginErr]=useState("Username & Password Doesn't Match");
+    const [isLoading,setIsLoading]=useState(true);
     const handleSubmit =(event)=>{
+        if(userLoginValues.userName!==''&& userLoginValues.password!=='')
+        {
+            setIsLoading(false);
         event.preventDefault();
             // Axios request to Login into the user Account
             Axios.post(loginUrl,{
                 userName:userLoginValues.userName,
                 password:userLoginValues.password}).then((response)=>{
+                    setIsLoading(true);
                     const token=response.data.token;
                     const userId=response.data.userId;
                     const name=response.data.name;
@@ -32,10 +39,21 @@ function UserLogin(){
                         navigate("/events/view");
                     }
                 }).catch((err)=>{
+                    setIsLoading(true);
+                    if(err.response.status===400){
+                        setLoginErr("User Doesn't Exits");
+                        setMisMatchErr(false);
+                    }
                     if(err.response.status===403){
+                        setLoginErr("Username & Password Doesn't Match");
                         setMisMatchErr(false);
                     }
             })
+        }
+        else{
+            setLoginErr("Please Fill details");
+            setMisMatchErr(false);
+        }
     };
     return(
         <>
@@ -59,7 +77,10 @@ function UserLogin(){
                             placeholder='Password'
                             onChange={handleChange}/>
                         <button className='login-button' onClick={handleSubmit}>Login</button>
-                        <h4 className='login-label-err'disabled={misMatchErr}>Email & Password Doesn't Match</h4>
+                        <div className='loader-login' disabled={isLoading}>
+                            <Loader/>
+                        </div>
+                        <h4 className='login-label-err'disabled={misMatchErr}>{loginErr}</h4>
                         <Link to="/user/register"> <h4 className='employee-login-label'>New User? Register</h4></Link>
             </div>
         </div>
